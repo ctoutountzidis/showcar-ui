@@ -23,21 +23,26 @@ export default function (tagName) {
         scrollbarWidth = measureScrollbarWidth();
 
         openElements.forEach(el => {
-            el.addEventListener('click', () => show(lb, el), false);
+            el.addEventListener('click', () => showByTrigger(lb, el), false);
         });
 
         lb.close.forEach(el => {
             el.addEventListener('click', e => hide(lb, e, lb.preventOutsideClose !== null), false);
         });
+        this.lb = lb;
     }
 
-    const show = (lb, opener) => {
+    const showByTrigger= (lb, opener) => {
         if (
             opener.hasAttribute('data-lightbox-prevent-open') &&
             opener.getAttribute('data-lightbox-prevent-open') == 'true'
         ) {
             return;
         }
+        show(lb);
+    };
+
+    const show = (lb) => {
         lb.overlay = document.createElement('div');
         lb.overlay.classList.add('sc-lightbox__overlay');
 
@@ -112,6 +117,10 @@ export default function (tagName) {
         this.onCloseCallbacks.push(cb);
     }
 
+    function showDirectly() {
+        show(this.lb);
+    }
+
     const measureScrollbarWidth = () => window && document && (window.innerWidth - document.documentElement.clientWidth) || 0;
 
     registerElement(
@@ -125,6 +134,9 @@ export default function (tagName) {
             },
             registerOnCloseCallback: {
                 value: registerOnCloseCallback
+            },
+            show: {
+                value: showDirectly
             }
         }
     );
