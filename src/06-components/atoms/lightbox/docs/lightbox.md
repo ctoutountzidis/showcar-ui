@@ -25,3 +25,10 @@ To trigger the lightbox programmatically you can use its `show` function like th
 const myLightbox = document.getElementsByTagName("as24-lightbox")[0];
 myLightbox.show();
 ```
+
+To trigger the lightbox programmatically you can use its `hide` function like this:<br/><br/>
+
+```js
+const myLightbox = document.getElementsByTagName("as24-lightbox")[0];
+myLightbox.hide();
+```

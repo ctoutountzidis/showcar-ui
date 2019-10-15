@@ -27,7 +27,7 @@ export default function (tagName) {
         });
 
         lb.close.forEach(el => {
-            el.addEventListener('click', e => hide(lb, e, lb.preventOutsideClose !== null), false);
+            el.addEventListener('click', e => hideByTrigger(lb, e, lb.preventOutsideClose !== null), false);
         });
         this.lb = lb;
     }
@@ -61,9 +61,9 @@ export default function (tagName) {
         lb.container.classList.add('sc-lightbox__container--visible');
 
         if (lb.preventOutsideClose === null) {
-            lb.overlay.addEventListener('click', e => hide(lb, e), false);
+            lb.overlay.addEventListener('click', e => hideByTrigger(lb, e), false);
             document.addEventListener('keydown', e => {
-                if (e.keyCode === 27) hide(lb, e);
+                if (e.keyCode === 27) hideByTrigger(lb, e);
             });
         }
 
@@ -81,27 +81,32 @@ export default function (tagName) {
     /**
      * @param {boolean} executeOnCloseCallback executeOnCloseCallback Hide method gets called twice when clicking on close button, but we want to run close callback only-once
      */
-    const hide = (lb, e, executeOnCloseCallback = true) => {
+    const hideByTrigger = (lb, e, executeOnCloseCallback = true) => {
         if (e.target === lb.overlay || lb.close.includes(e.target) || e.keyCode === 27) {
             e.preventDefault();
 
-            // Unapply scrollbar fixes
-            const html = document.querySelector('html');
-            html.classList.remove('sc-unscroll');
-            html.style.marginRight = 0; // reset margin
-
-            lb.container.classList.remove('sc-lightbox__container--visible');
-            lb.parent.appendChild(lb.container);
-            if (lb.overlay) {
-                lb.overlay.classList.remove('sc-lightbox--fadein');
-                setTimeout(() => {
-                    lb.overlay.remove();
-                }, 250);
-            }
-
-            executeOnCloseCallback && lb.self.onCloseCallbacks.forEach(cb => cb());
+            hide(lb, executeOnCloseCallback);
         }
     };
+
+    const hide = (lb, executeOnCloseCallback) => {
+        // Unapply scrollbar fixes
+        const html = document.querySelector('html');
+        html.classList.remove('sc-unscroll');
+        html.style.marginRight = 0; // reset margin
+
+        lb.container.classList.remove('sc-lightbox__container--visible');
+        lb.parent.appendChild(lb.container);
+        if (lb.overlay) {
+            lb.overlay.classList.remove('sc-lightbox--fadein');
+            setTimeout(() => {
+                lb.overlay.remove();
+            }, 250);
+        }
+
+        executeOnCloseCallback && lb.self.onCloseCallbacks.forEach(cb => cb());
+    };
+    
 
     /**
      * Register callback to the current custom-element instance the call is made on
@@ -121,6 +126,10 @@ export default function (tagName) {
         show(this.lb);
     }
 
+    function hideDirectly() {
+        hide(this.lb, true);
+    }
+
     const measureScrollbarWidth = () => window && document && (window.innerWidth - document.documentElement.clientWidth) || 0;
 
     registerElement(
@@ -137,7 +146,10 @@ export default function (tagName) {
             },
             show: {
                 value: showDirectly
-            }
+            },
+            hide: {
+                value: hideDirectly
+            }            
         }
     );
 }
