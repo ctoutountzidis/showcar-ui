@@ -18,3 +18,10 @@ You can register (multiple) callbacks for when the lightbox opens/closes by call
 const myLightbox = document.getElementsByTagName("as24-lightbox")[0];
 myLightbox.registerOnOpenCallback(() => console.log("open!"));
 ```
+
+To trigger the lightbox programmatically you can use its `show` function like this:<br/><br/>
+
+```js
+const myLightbox = document.getElementsByTagName("as24-lightbox")[0];
+myLightbox.show();
+```
